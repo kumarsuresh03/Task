@@ -10,10 +10,11 @@ pipeline {
         stage('Build MongoDB') {
             steps {
                 script {
-                    def mongodbPath = "MongoDB/Dockerfile.mongo"
+                    def mongodbPath = "MongoDB"
+                    def dockerfileMongo = "MongoDB/Dockerfile.mongo"
                     if (fileExists(mongodbPath)) {
-                        bat "docker build -t ${mongodbImage}:latest ${mongodbPath}"
-                        bat "docker tag ${mongodbImage} sureshnangina/mern-mongodb:mern-mongodb"
+                        bat "docker build -f ${dockerfileMongo} -t ${mongodbImage}:latest ${mongodbPath}"
+                        bat "docker tag ${mongodbImage}:latest sureshnangina/mern-mongodb:latest"
                     } else {
                         error "MongoDB directory ${mongodbPath} not found"
                     }
@@ -23,10 +24,11 @@ pipeline {
         stage('Build Node.js') {
             steps {
                 script {
-                    def nodePath = "Node-App/Dockerfile"
+                    def nodePath = "Node-App"
+                    def dockerfileNode = "Node-App/Dockerfile"
                     if (fileExists(nodePath)) {
-                        bat "docker build -t ${nodeImage}:latest ${nodePath}"
-                        bat "docker tag ${nodeImage} sureshnangina/mern-node:mern-node"
+                        bat "docker build -f ${dockerfileNode} -t ${nodeImage}:latest ${nodePath}"
+                        bat "docker tag ${nodeImage}:latest sureshnangina/mern-node:latest"
                     } else {
                         error "Node.js directory ${nodePath} not found"
                     }
@@ -36,9 +38,9 @@ pipeline {
         stage('Push MongoDB') {
             steps {
                 script {
-                    docker.withRegistry("https://index.docker.io/v1/", 'dockerhub-credentials') {
+                    docker.withRegistry(dockerRegistry, 'dockerhub-credentials') {
                         echo "Pushing MongoDB image to Docker Hub"
-                        bat "docker push sureshnangina/mern-mongodb:${mongodbImage}"
+                        bat "docker push sureshnangina/mern-mongodb:latest"
                     }
                 }
             }
@@ -48,7 +50,7 @@ pipeline {
                 script {
                     docker.withRegistry(dockerRegistry, 'dockerhub-credentials') {
                         echo "Pushing Node.js image to Docker Hub"
-                        bat "docker push sureshnangina/mern-node:${nodeImage}"
+                        bat "docker push sureshnangina/mern-node:latest"
                     }
                 }
             }
