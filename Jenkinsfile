@@ -10,7 +10,7 @@ pipeline {
         stage('Build MongoDB') {
             steps {
                 script {
-                    def mongodbPath = "MongoDB"
+                    def mongodbPath = "MongoDB/Dockerfile.mongo"
                     if (fileExists(mongodbPath)) {
                         bat "docker build -t ${mongodbImage}:latest ${mongodbPath}"
                         bat "docker tag ${mongodbImage} sureshnangina/mern-mongodb:mern-mongodb"
@@ -23,7 +23,7 @@ pipeline {
         stage('Build Node.js') {
             steps {
                 script {
-                    def nodePath = "Node-App"
+                    def nodePath = "Node-App/Dockerfile"
                     if (fileExists(nodePath)) {
                         bat "docker build -t ${nodeImage}:latest ${nodePath}"
                         bat "docker tag ${nodeImage} sureshnangina/mern-node:mern-node"
